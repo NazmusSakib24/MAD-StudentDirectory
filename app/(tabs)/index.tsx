@@ -1,77 +1,103 @@
-import { StyleSheet, View } from "react-native"; 
-
-// Importing our custom StudentItem component to display each student in the list 
-
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native"; 
 import StudentItem from "@/components/student-item"; 
-
-// Importing the list of students from our data file 
-
-import { STUDENTS } from "@/data/student"; 
-
- 
+import { Student, STUDENTS } from "@/data/student"; 
+import SearchBar from "@/components/search-bar"; 
+import StudentDetail from "@/components/student-detail"; 
+import { useState } from "react"; 
 
 export default function HomeScreen() { 
 
+    const [query, setQuery] = useState<string>(""); 
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null); 
+    const handleSelect = (student: Student) => { 
+      setSelectedStudent((prev) => (prev?.id === student.id ? null : student)); 
+    }; 
+    const filtered = STUDENTS.filter((s) => { 
+        return ( 
+          s.name.toLowerCase().includes(query.toLowerCase()) || // check if name matches query OR 
+          s.department.toLowerCase().includes(query.toLowerCase()) // check if department matches query 
+        ); 
+    }); 
+
+ 
+
     return ( 
 
-        // View is the container that contains the list of students. 
+        <ScrollView style={styles.container}> 
+            <View style={styles.titleBar}> 
+              <Text style={styles.title}>Student Directory</Text> 
+            </View> 
+            <SearchBar value={query} onChangeText={setQuery} /> 
 
-        // We map over the STUDENTS array and render a StudentItem for each student. 
-
-        <View style={styles.container}> 
-
-            {STUDENTS.map((student) => ( 
-
-                <StudentItem key={student.id} student={student} onPress={() => {}} isSelected={false} /> 
-
-            ))} 
-
-        </View> 
-
+            <FlatList 
+              data={filtered} 
+              keyExtractor={(item) => item.id} 
+                renderItem={({ item }) => <StudentItem student={item} onPress={handleSelect} isSelected={selectedStudent?.id === item.id} />} 
+                ListEmptyComponent={ 
+                  <View style={styles.empty}> 
+                    <Text style={styles.emptyText}>No students match "{query}"</Text> 
+                  </View> 
+                } 
+            /> 
+            {selectedStudent && <StudentDetail student={selectedStudent} />} 
+        </ScrollView> 
     ); 
 
 } 
 
- 
-
 const styles = StyleSheet.create({ 
 
     container: { 
-
-        flex: 1, 
-
+      flex: 1, 
+      backgroundColor: "#F0F4F8", 
     }, 
 
     titleContainer: { 
-
-        flexDirection: "row", 
-
-        alignItems: "center", 
-
-        gap: 8, 
-
+      flexDirection: "row", 
+      alignItems: "center", 
+      gap: 8, 
     }, 
 
     stepContainer: { 
-
-        gap: 8, 
-
-        marginBottom: 8, 
-
+      gap: 8, 
+      marginBottom: 8, 
     }, 
 
     reactLogo: { 
+      height: 178, 
+      width: 290, 
+      bottom: 0, 
+      left: 0, 
+      position: "absolute", 
+    }, 
+    titleBar: { 
+      flexDirection: "row", 
+      justifyContent: "space-between", 
+      alignItems: "center", 
+      paddingHorizontal: 16, 
+      paddingVertical: 14, 
+      backgroundColor: "#0D1F4E", 
+    }, 
 
-        height: 178, 
+    title: { 
+      fontSize: 20, 
+      fontWeight: "bold", 
+      color: "#FFFFFF", 
+    }, 
 
-        width: 290, 
+    count: { 
+      fontSize: 12, 
+      color: "#CCFBF1", 
+    }, 
 
-        bottom: 0, 
+    empty: { 
+        padding: 40, 
+        alignItems: "center", 
+    }, 
 
-        left: 0, 
-
-        position: "absolute", 
-
+    emptyText: { 
+        fontSize: 14, 
+        color: "#94A3B8", 
     }, 
 
 }); 

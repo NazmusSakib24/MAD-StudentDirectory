@@ -1,8 +1,6 @@
-// components/student-item.tsx 
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"; 
 import { Student } from "../data/student"; 
 
-// TypeScript interface — defines exactly what props this component accepts 
 interface StudentItemProps { 
 
   student: Student; 
@@ -18,14 +16,12 @@ export default function StudentItem({ student, onPress, isSelected }: StudentIte
       onPress={() => onPress(student)} 
       activeOpacity={0.7} 
     > 
-      
-      {/* Avatar image */} 
+
       <Image 
         source={{ uri: student.avatarUrl }} 
         style={styles.avatar} 
         resizeMode="cover" 
-      /> 
-      {/* Text content */} 
+      />
       <View style={styles.info}> 
         <Text style={styles.name} numberOfLines={1}> 
           {student.name} 
@@ -45,8 +41,8 @@ export default function StudentItem({ student, onPress, isSelected }: StudentIte
 const styles = StyleSheet.create({ 
 
   row: { 
-    flexDirection: "row",       // lay children horizontally 
-    alignItems: "center",        // vertically centre within the row 
+    flexDirection: "row",       
+    alignItems: "center",        
     paddingVertical: 12, 
     paddingHorizontal: 16, 
     backgroundColor: "#FFFFFF", 
@@ -55,16 +51,16 @@ const styles = StyleSheet.create({
   }, 
 
   rowSelected: { 
-    backgroundColor: "#E1F5EE",  // highlight when selected 
+    backgroundColor: "#E1F5EE", 
   }, 
   avatar: { 
     width: 52, 
     height: 52, 
-    borderRadius: 26,            // half of width/height = circle 
+    borderRadius: 26,            
     marginRight: 14, 
   }, 
   info: { 
-    flex: 1,                     // take all remaining horizontal space 
+    flex: 1,                     
   }, 
   name: { 
     fontSize: 15, 

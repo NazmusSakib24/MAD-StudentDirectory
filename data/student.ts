@@ -1,5 +1,3 @@
-// data/students.ts 
-
 
 export interface Student { 
 
@@ -84,7 +82,7 @@ export const STUDENTS: Student[] = [
     bio: "Interested in cloud computing and DevOps practices.", 
     skills: ["AWS", "Docker", "Linux"], 
     avatarUrl: "https://i.pravatar.cc/150?img=9", 
-    
+
   }, 
 
 ];
