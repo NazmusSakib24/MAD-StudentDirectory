@@ -1,4 +1,4 @@
-import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native"; 
+import { FlatList, ScrollView, StyleSheet, Text, View, TouchableOpacity } from "react-native"; 
 import StudentItem from "@/components/student-item"; 
 import { Student, STUDENTS } from "@/data/student"; 
 import SearchBar from "@/components/search-bar"; 
@@ -9,17 +9,21 @@ export default function HomeScreen() {
 
     const [query, setQuery] = useState<string>(""); 
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null); 
+    const [departmentFilter, setDepartmentFilter] = useState<string>("All");
     const handleSelect = (student: Student) => { 
       setSelectedStudent((prev) => (prev?.id === student.id ? null : student)); 
     }; 
-    const filtered = STUDENTS.filter((s) => { 
-        return ( 
-          s.name.toLowerCase().includes(query.toLowerCase()) || // check if name matches query OR 
-          s.department.toLowerCase().includes(query.toLowerCase()) // check if department matches query 
-        ); 
-    }); 
+    const filtered = STUDENTS.filter((s) => {
+      const matchesQuery =
+        s.name.toLowerCase().includes(query.toLowerCase()) ||
+        s.department.toLowerCase().includes(query.toLowerCase());
 
- 
+        const matchesDepartment =
+          departmentFilter === "All" ||
+          s.department === departmentFilter;
+
+        return matchesQuery && matchesDepartment;
+    }); 
 
     return ( 
 
@@ -27,6 +31,27 @@ export default function HomeScreen() {
             <View style={styles.titleBar}> 
               <Text style={styles.title}>Student Directory</Text> 
             </View> 
+            <View style={styles.filterTabs}>
+  {["All", "Computer Science", "Software Engineering"].map((dept) => (
+    <TouchableOpacity
+      key={dept}
+      style={[
+        styles.tab,
+        departmentFilter === dept && styles.activeTab,
+      ]}
+      onPress={() => setDepartmentFilter(dept)}
+    >
+      <Text
+        style={[
+          styles.tabText,
+          departmentFilter === dept && styles.activeTabText,
+        ]}
+      >
+        {dept}
+      </Text>
+    </TouchableOpacity>
+  ))}
+</View>
             <SearchBar value={query} onChangeText={setQuery} /> 
 
             <FlatList 
@@ -99,5 +124,32 @@ const styles = StyleSheet.create({
         fontSize: 14, 
         color: "#94A3B8", 
     }, 
+    filterTabs: {
+  flexDirection: "row",
+  paddingHorizontal: 10,
+  paddingVertical: 10,
+  gap: 8,
+},
+
+tab: {
+  paddingHorizontal: 12,
+  paddingVertical: 6,
+  borderRadius: 20,
+  backgroundColor: "#E2E8F0",
+},
+
+activeTab: {
+  backgroundColor: "#2563EB",
+},
+
+tabText: {
+  fontSize: 12,
+  color: "#334155",
+},
+
+activeTabText: {
+  color: "#FFFFFF",
+  fontWeight: "bold",
+},
 
 }); 
