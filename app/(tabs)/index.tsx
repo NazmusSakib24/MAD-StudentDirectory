@@ -3,6 +3,7 @@ import StudentItem from "@/components/student-item";
 import { Student, STUDENTS } from "@/data/student"; 
 import SearchBar from "@/components/search-bar"; 
 import StudentDetail from "@/components/student-detail"; 
+import AddStudentForm from "@/components/add-student-form";
 import { useState } from "react"; 
 
 export default function HomeScreen() { 
@@ -10,10 +11,16 @@ export default function HomeScreen() {
     const [query, setQuery] = useState<string>(""); 
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null); 
     const [departmentFilter, setDepartmentFilter] = useState<string>("All");
+    const [students, setStudents] = useState<Student[]>(STUDENTS);
+    const [showForm, setShowForm] = useState(false);
     const handleSelect = (student: Student) => { 
       setSelectedStudent((prev) => (prev?.id === student.id ? null : student)); 
     }; 
-    const filtered = STUDENTS.filter((s) => {
+    const handleNewStudent = (newStudent: Student) => {
+      setStudents((prev) => [newStudent, ...prev]);
+      setShowForm(false);
+    };
+    const filtered = students.filter((s) => {
       const matchesQuery =
         s.name.toLowerCase().includes(query.toLowerCase()) ||
         s.department.toLowerCase().includes(query.toLowerCase());
@@ -24,13 +31,27 @@ export default function HomeScreen() {
 
         return matchesQuery && matchesDepartment;
     }); 
-
+    if (showForm) {
+  return <AddStudentForm onSubmitSuccess={handleNewStudent} />;
+  }
     return ( 
 
         <ScrollView style={styles.container}> 
-            <View style={styles.titleBar}> 
-              <Text style={styles.title}>Student Directory</Text> 
-            </View> 
+           <View style={styles.titleBar}>
+  <Text style={styles.title}>Student Directory</Text>
+
+  <TouchableOpacity onPress={() => setShowForm(true)}>
+    <Text
+      style={{
+        color: "#FFFFFF",
+        fontWeight: "700",
+        fontSize: 16,
+      }}
+    >
+      + Add
+    </Text>
+  </TouchableOpacity>
+</View>
             <View style={styles.filterTabs}>
   {["All", "Computer Science", "Software Engineering"].map((dept) => (
     <TouchableOpacity

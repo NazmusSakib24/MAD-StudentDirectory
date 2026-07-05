@@ -188,7 +188,17 @@ return (
         autoCapitalize="none"
       /> 
 
-      {/* Submit button goes here — Section 6 */} 
+      <Pressable
+        style={[styles.button, !isFormValid && styles.buttonDisabled]}
+        onPress={handleSubmitPress}
+        disabled={!isFormValid || isSubmitting}
+        >
+        {isSubmitting ? (
+            <ActivityIndicator color="#FFFFFF" />
+        ) : (
+            <Text style={styles.buttonText}>Join Directory</Text>
+  )}
+</Pressable>
     </ScrollView> 
   ); 
 } 
@@ -197,6 +207,22 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FFFFFF", padding: 20 }, 
   heading: { fontSize: 20, fontWeight: "800", color: "#0D1F4E", marginBottom: 4 }, 
   subheading: { fontSize: 13, color: "#64748B", marginBottom: 24, lineHeight: 19 }, 
+  button: {
+  backgroundColor: "#0D9488",
+  borderRadius: 12,
+  paddingVertical: 14,
+  alignItems: "center",
+  marginTop: 8,
+  marginBottom: 32,
+    },
+    buttonDisabled: {
+    backgroundColor: "#CBD5E1",
+    },
+    buttonText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "700",
+    },
 });  
 
 
