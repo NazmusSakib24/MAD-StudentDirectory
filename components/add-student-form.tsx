@@ -67,7 +67,17 @@ export default function AddStudentForm({ onSubmitSuccess }: AddStudentFormProps)
 
   const [errors, setErrors] = useState<FormErrors>({}); 
   const [isSubmitting, setIsSubmitting] = useState(false); 
-  
+  const [submitTrigger, setSubmitTrigger] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+    const [submitAttempted, setSubmitAttempted] = useState(false);
+
+    const markTouched = (field: keyof FormData) => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+    };
+
+const getFieldError = (field: keyof FormErrors) => {
+  return touched[field] || submitAttempted ? errors[field] : undefined;
+};
   const updateField = (field: keyof FormData, value: string) => { 
     setFormData((prev) => ({ ...prev, [field]: value })); 
   }; 
@@ -76,11 +86,52 @@ useEffect(() => {
   setErrors(newErrors);
 }, [formData]);
 
+useEffect(() => {
+  if (!submitTrigger) return;
+
+  const timeoutId = setTimeout(() => {
+    const newStudent: Student = {
+      id: Date.now().toString(),
+      name: formData.name.trim(),
+      studentId: formData.studentId.trim(),
+      department: formData.department.trim(),
+      bio: formData.bio.trim(),
+      skills: formData.skillsText
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0),
+      avatarUrl: "https://i.pravatar.cc/150?u=" + Date.now(),
+    };
+
+    setIsSubmitting(false);
+    setSubmitTrigger(false);
+    onSubmitSuccess(newStudent);
+  }, 1500);
+
+  return () => {
+    clearTimeout(timeoutId);
+  };
+}, [submitTrigger]);
+
 const isFormValid =
   Object.keys(errors).length === 0 &&
   formData.name.length > 0 &&
   formData.studentId.length > 0;
-  
+const handleSubmitPress = () => { 
+  setTouched((prev) => ({ 
+    ...prev, 
+    name: true, 
+    studentId: true, 
+    department: true, 
+    bio: true, 
+  })); 
+  setSubmitAttempted(true); 
+  if (isFormValid) { 
+    setIsSubmitting(true); 
+    setSubmitTrigger(true); 
+  } 
+
+}; 
 return ( 
 
     <ScrollView style={styles.container}> 
@@ -94,40 +145,45 @@ return (
         label="Full Name" 
         value={formData.name} 
         onChangeText={(text) => updateField("name", text)} 
+        onBlur={() => markTouched("name")}
         placeholder="e.g. Ashraful Haque" 
-        error={errors.name} 
+        error={getFieldError("name")}
       /> 
 
       <FormField 
         label="Student ID" 
         value={formData.studentId} 
-        onChangeText={(text) => updateField("studentId", text)} 
+        onChangeText={(text) => updateField("studentId", text)}
+        onBlur={() => markTouched("name")} 
         placeholder="e.g. 22-12345-1" 
         autoCapitalize="none" 
-        error={errors.studentId} 
+        error={getFieldError("studentId")}
       /> 
 
       <FormField 
         label="Department" 
         value={formData.department} 
         onChangeText={(text) => updateField("department", text)} 
+        onBlur={() => markTouched("name")}
         placeholder="e.g. Computer Science" 
-        error={errors.department} 
+        error={getFieldError("department")}
       /> 
 
       <FormField 
         label="Bio" 
         value={formData.bio} 
-        onChangeText={(text) => updateField("bio", text)} 
+        onChangeText={(text) => updateField("bio", text)}
+        onBlur={() => markTouched("name")} 
         placeholder="A short sentence about yourself..." 
         multiline 
-        error={errors.bio} 
+        error={getFieldError("bio")}
       /> 
 
       <FormField 
         label="Skills (comma-separated)" 
         value={formData.skillsText} 
-        onChangeText={(text) => updateField("skillsText", text)} 
+        onChangeText={(text) => updateField("skillsText", text)}
+        onBlur={() => markTouched("name")} 
         placeholder="e.g. React Native, TypeScript, Figma" 
         autoCapitalize="none"
       /> 
